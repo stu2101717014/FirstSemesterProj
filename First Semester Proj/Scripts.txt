@@ -1,0 +1,3 @@
+CREATE DATABASE DogDB;
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'wofwof';
+GRANT ALL PRIVILEGES ON dogdb.* TO 'admin'@'localhost';
