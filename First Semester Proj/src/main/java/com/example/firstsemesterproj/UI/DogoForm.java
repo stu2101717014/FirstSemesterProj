@@ -5,16 +5,21 @@ import com.example.firstsemesterproj.entities.Owner;
 import com.example.firstsemesterproj.entities.Shelter;
 import com.example.firstsemesterproj.services.DogoService;
 import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -39,8 +44,10 @@ public class DogoForm extends FormLayout {
         this.listDogsLayoutRef = ldlref;
         this.gridRef = grid;
         this.service = service;
-        setDogoInner(dogo);
-        add(dogoName, dogoBreed, dogoOwners, dogoShelters, createButtonsLayout());
+        setDogo(dogo);
+
+        add(dogoName, dogoBreed, dogoOwners, dogoShelters
+                , createButtonsLayout());
     }
 
     private HorizontalLayout createButtonsLayout() {
@@ -58,11 +65,7 @@ public class DogoForm extends FormLayout {
         return new HorizontalLayout(save, delete, close);
     }
 
-    public void setDogo(Dog Dogo) {
-        setDogoInner(Dogo);
-    }
-
-    private void setDogoInner(Dog dogo) {
+    public void setDogo(Dog dogo) {
         if (dogo == null) {
             dogoName.setValue("");
             dogoBreed.setValue("");
@@ -74,6 +77,7 @@ public class DogoForm extends FormLayout {
             dogoBreed.setValue(dogo.getBreed());
             dogoOwners.setValue(String.join(", ", dogo.getOwners().stream().map(o -> o.getName()).collect(Collectors.toList())));
             dogoShelters.setValue(String.join(", ", dogo.getShelters().stream().map(s -> s.getLocation()).collect(Collectors.toList())));
+
             lastDogRef = dogo;
         }
     }
@@ -103,26 +107,35 @@ public class DogoForm extends FormLayout {
 
     private void manageOwners() {
         List<String> allOwnersFromUI = Arrays.stream(this.dogoOwners.getValue().split(", ")).collect(Collectors.toList());
-        List<String> allPersistedOwners = lastDogRef.getOwners().stream().map(_do -> _do.getName()).collect(Collectors.toList());
-        List<String> newOwners = allOwnersFromUI.stream().filter(uio -> !allPersistedOwners.contains(uio)).collect(Collectors.toList());
+        List<String> allPersistedOwnersLinkedToLastRefDogo = lastDogRef.getOwners().stream().map(_do -> _do.getName()).collect(Collectors.toList());
+        List<String> newOwners = allOwnersFromUI.stream().filter(uio -> !allPersistedOwnersLinkedToLastRefDogo.contains(uio)).collect(Collectors.toList());
 
-        List<String> ownersForRemove = allPersistedOwners.stream().filter(pdo -> !allOwnersFromUI.contains(pdo)).collect(Collectors.toList());
+        List<String> ownersForRemove = allPersistedOwnersLinkedToLastRefDogo.stream().filter(pdo -> !allOwnersFromUI.contains(pdo)).collect(Collectors.toList());
         lastDogRef.getOwners().removeIf(ow -> ownersForRemove.contains(ow.getName()));
 
+        List<Owner> allOwners = service.getAllOwners("", "");
+        List<String> allPersistedOwners = allOwners.stream().map(o -> o.getName()).collect(Collectors.toList());
+
         newOwners.forEach(no -> {
-            Owner owner = new Owner();
-            owner.setName(no);
-            Owner persisted = service.persistOrUpdateOwner(owner);
-            lastDogRef.getOwners().add(persisted);
+            if (allPersistedOwners.contains(no)){
+                allOwners.stream().filter(owner -> owner.getName().equals(no)).findFirst().ifPresent(owner -> {
+                    lastDogRef.getOwners().add(owner);
+                });
+            }else {
+                Owner owner = new Owner();
+                owner.setName(no);
+                Owner persisted = service.persistOrUpdateOwner(owner);
+                lastDogRef.getOwners().add(persisted);
+            }
         });
     }
 
     private void manageShelters(){
         List<String> allSheltersFromUI = Arrays.stream(this.dogoShelters.getValue().split(", ")).collect(Collectors.toList());
-        List<String> allPersistedShelters = lastDogRef.getShelters().stream().map(sh -> sh.getLocation()).collect(Collectors.toList());
-        List<String> newShelters = allSheltersFromUI.stream().filter(sh -> !allPersistedShelters.contains(sh)).collect(Collectors.toList());
+        List<String> allPersistedSheltersLinkedToLastRefDogo = lastDogRef.getShelters().stream().map(sh -> sh.getLocation()).collect(Collectors.toList());
+        List<String> newShelters = allSheltersFromUI.stream().filter(sh -> !allPersistedSheltersLinkedToLastRefDogo.contains(sh)).collect(Collectors.toList());
 
-        List<String> sheltersForRemove = allPersistedShelters.stream().filter(psh -> !allSheltersFromUI.contains(psh)).collect(Collectors.toList());
+        List<String> sheltersForRemove = allPersistedSheltersLinkedToLastRefDogo.stream().filter(psh -> !allSheltersFromUI.contains(psh)).collect(Collectors.toList());
         lastDogRef.getShelters().removeIf(sh -> sheltersForRemove.contains(sh.getLocation()));
 
         newShelters.forEach(sh -> {

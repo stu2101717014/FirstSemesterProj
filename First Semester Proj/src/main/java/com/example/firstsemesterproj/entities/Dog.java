@@ -28,12 +28,14 @@ public class Dog {
     @Column(name = "name", length = 255, nullable = true)
     private String name;
 
-    @Column(name = "breed", length = 255, nullable = true)
+    @Column(name = "breed", length = 255, nullable = false)
+    @org.hibernate.annotations.ColumnDefault("unknown")
     private String breed;
 
     @Column(name = "pic_id", length = 255, nullable = true)
     private String picId;
 
+    @Column(name = "is_deleted")
     private boolean isDeleted = false;
 
     public Long getId() {

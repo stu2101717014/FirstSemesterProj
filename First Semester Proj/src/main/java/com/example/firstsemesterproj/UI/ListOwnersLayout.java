@@ -20,25 +20,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@Route(value="", layout = MainLayout.class)
+@Route(value="Owners", layout = MainLayout.class)
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ListDogsLayout extends VerticalLayout {
+public class ListOwnersLayout extends VerticalLayout {
 
-    private final Grid<Dog>  grid = new Grid<>(Dog.class);
-    public TextField filterTextByDogoName = new TextField();
+    private final Grid<Owner> grid = new Grid<>(Owner.class);
+
     public TextField filterTextByOwnerName = new TextField();
+    public TextField filterTextByDogoName = new TextField();
+    private Button newOwnerButton = new Button("New owner");
+
+    private OwnerForm form;
+
     private DogoService service;
-    DogoForm form;
 
-    private Button newDogoButton = new Button("New Dogo");
-
-    public ListDogsLayout(DogoService service) {
+    public ListOwnersLayout(DogoService service) {
         super.setSizeFull();
         this.service = service;
 
         configureGrid();
 
-        form = new DogoForm(null, this.service, grid, this);
+        form = new OwnerForm(null, this.service, grid, this);
         form.setWidth("25em");
         form.setVisible(false);
 
@@ -49,27 +51,11 @@ public class ListDogsLayout extends VerticalLayout {
         content.addClassNames("content", "gap-m");
         content.setSizeFull();
 
-        newDogoButton.addClickListener(click -> editDogo(initNewDogo()));
-        add(new HorizontalLayout(getToolbarOnDogoName(), getToolbarOnOwnerName(), newDogoButton), content);
+        newOwnerButton.addClickListener(click -> editOwner(initNewOwner()));
+        add(new HorizontalLayout(getToolbarOnOwnerName(), getToolbarOnDogoName(), newOwnerButton), content);
+
         updateList(this.filterTextByDogoName.getValue(), this.filterTextByOwnerName.getValue());
-
-        grid.asSingleSelect().addValueChangeListener(event -> editDogo(event.getValue()));
-    }
-
-    private void configureGrid() {
-        grid.addClassNames("dogo-grid");
-        grid.setSizeFull();
-        grid.setColumns("name", "breed");
-        grid.addColumn(dog -> String.join(", ", dog.getOwners().stream().map(o -> o.getName()).collect(Collectors.toList()))).setHeader("Owners");
-        grid.addColumn(dog -> String.join(", ", dog.getShelters().stream().map(s -> s.getLocation()).collect(Collectors.toList()))).setHeader("Shelters");
-
-        grid.getColumns().forEach(col -> col.setAutoWidth(true));
-    }
-
-    public void updateList(String dogoNameFilter, String ownerNameFilter) {
-        List<Dog> allDogosByName = service.findAllDogosByDogoNameAndOwnerName(dogoNameFilter, ownerNameFilter);
-        grid.setItems(allDogosByName);
-
+        grid.asSingleSelect().addValueChangeListener(event -> editOwner(event.getValue()));
     }
 
     private HorizontalLayout getToolbarOnDogoName() {
@@ -94,29 +80,40 @@ public class ListDogsLayout extends VerticalLayout {
         return toolbar;
     }
 
-    public void editDogo(Dog dogo) {
-        if (dogo == null) {
+    public void editOwner(Owner owner) {
+        if (owner == null) {
             closeEditor();
         } else {
-            form.setDogo(dogo);
+            form.setOwner(owner);
             form.setVisible(true);
             addClassName("editing");
         }
     }
 
     private void closeEditor() {
-        form.setDogo(null);
+        form.setOwner(null);
         form.setVisible(false);
         removeClassName("editing");
     }
 
-    private Dog initNewDogo() {
-        Dog dog = new Dog();
-        dog.setName("");
-        dog.setBreed("");
-        dog.setDeleted(false);
-        dog.setOwners(new HashSet<>());
-        dog.setShelters(new HashSet<>());
-        return dog;
+    private Owner initNewOwner() {
+        Owner owner = new Owner();
+        owner.setName("");
+        owner.setDogs(new HashSet<Dog>());
+        return owner;
+    }
+
+    private void configureGrid() {
+        grid.addClassNames("owner-grid");
+        grid.setSizeFull();
+        grid.setColumns("name");
+        grid.addColumn(owners -> String.join(", ", owners.getDogs().stream().map(d -> d.getName()).collect(Collectors.toList()))).setHeader("Dogos");
+
+        grid.getColumns().forEach(col -> col.setAutoWidth(true));
+    }
+
+    public void updateList(String dogoName, String ownerName) {
+        List<Owner> allOwners = service.getAllOwners(ownerName, dogoName);
+        grid.setItems(allOwners);
     }
 }

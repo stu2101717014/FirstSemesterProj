@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,20 +36,37 @@ public class DogoService {
         String ownerNameInnerParam = ownerName == null ? "" : ownerName;
 
 
-        return dogRepository.findAll().stream().filter(dog ->
+        List<Dog> dogosRes = dogRepository.findAll().stream().filter(dog ->
                 (dogoNameInnerParam.isEmpty() || dog.getName().contains(dogoNameInnerParam)) &&
                         (ownerNameInnerParam.isEmpty() || dog.getOwners().stream().anyMatch(o -> o.getName().contains(ownerNameInnerParam))) &&
                         !dog.getDeleted()
         ).collect(Collectors.toList());
 
+        dogosRes.forEach(dog -> {
+            Set<Owner> owners = dog.getOwners();
+            owners.removeIf(owner -> owner.isDeleted());
+        });
+
+        return dogosRes;
     }
 
     public List<Shelter> getAllShelters() {
         return this.shelterRepository.findAll();
     }
 
-    public List<Owner> getAllOwners() {
-        return this.ownerRepository.findAll();
+    public List<Owner> getAllOwners(String ownerName, String dogoName) {
+        String dogoNameInnerParam = dogoName == null ? "" : dogoName;
+        String ownerNameInnerParam = ownerName == null ? "" : ownerName;
+
+        return this.ownerRepository.findAll().stream().filter(o ->
+                (ownerNameInnerParam.isEmpty() || o.getName().contains(ownerNameInnerParam)) &&
+                        (dogoNameInnerParam.isEmpty() || o.getDogs().stream().anyMatch(d -> d.getName().contains(dogoNameInnerParam))) &&
+                        !o.isDeleted()
+        ).collect(Collectors.toList());
+    }
+
+    public List<Dog> getAllDogsByOwner(Owner owner){
+        return dogRepository.findAll().stream().filter(d -> d.getOwners().contains(owner)).collect(Collectors.toList());
     }
 
     public Dog persistOrUpdateDog(Dog dog) {
@@ -61,5 +79,9 @@ public class DogoService {
 
     public Shelter persistOrUpdateShelter(Shelter shelter) {
         return this.shelterRepository.saveAndFlush(shelter);
+    }
+
+    public Owner getOwnerById(Long ownerId){
+        return this.ownerRepository.getById(ownerId);
     }
 }

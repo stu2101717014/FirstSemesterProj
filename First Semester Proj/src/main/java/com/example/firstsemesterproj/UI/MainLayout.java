@@ -15,8 +15,12 @@ public class MainLayout extends AppLayout {
         RouterLink listLink = new RouterLink("Dogos", ListDogsLayout.class);
         listLink.setHighlightCondition(HighlightConditions.sameLocation());
 
+        RouterLink listOwnersLink = new RouterLink("Owners", ListOwnersLayout.class);
+
         addToDrawer(new VerticalLayout(
-                listLink
+                listLink,
+                listOwnersLink
         ));
+        
     }
 }

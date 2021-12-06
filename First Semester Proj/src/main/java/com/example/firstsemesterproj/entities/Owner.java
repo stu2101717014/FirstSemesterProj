@@ -11,11 +11,14 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToMany(mappedBy = "owners")
+    @ManyToMany(mappedBy = "owners", fetch = FetchType.EAGER)
     private Set<Dog> dogs;
 
     @Column(name = "name", length = 255, nullable = true)
     private String name;
+
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
 
     public Long getId() {
         return id;
@@ -35,5 +38,17 @@ public class Owner {
 
     public Set<Dog> getDogs() {
         return dogs;
+    }
+
+    public void setDogs(Set<Dog> dogs) {
+        this.dogs = dogs;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }

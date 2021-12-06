@@ -18,6 +18,9 @@ public class Shelter {
     @Column(name = "location", length = 255, nullable = true)
     private String location;
 
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
+
     public Long getId() {
         return id;
     }
@@ -32,5 +35,13 @@ public class Shelter {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }
