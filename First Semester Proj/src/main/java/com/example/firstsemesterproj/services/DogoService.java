@@ -50,8 +50,34 @@ public class DogoService {
         return dogosRes;
     }
 
-    public List<Shelter> getAllShelters() {
-        return this.shelterRepository.findAll();
+    public List<Dog> findAllDogosByDogoNameAndShelterName(String dogoName, String shelterName) {
+        String dogoNameInnerParam = dogoName == null ? "" : dogoName;
+        String shelterNameInnerParam = shelterName == null ? "" : shelterName;
+
+
+        List<Dog> dogosRes = dogRepository.findAll().stream().filter(dog ->
+                (dogoNameInnerParam.isEmpty() || dog.getName().contains(dogoNameInnerParam)) &&
+                        (shelterNameInnerParam.isEmpty() || dog.getShelters().stream().anyMatch(o -> o.getLocation().contains(shelterNameInnerParam))) &&
+                        !dog.getDeleted()
+        ).collect(Collectors.toList());
+
+        dogosRes.forEach(dog -> {
+            Set<Shelter> shelter = dog.getShelters();
+            shelter.removeIf(shltr -> shltr.isDeleted());
+        });
+
+        return dogosRes;
+    }
+
+    public List<Shelter> getAllShelters(String shelterName, String dogoName) {
+        String dogoNameInnerParam = dogoName == null ? "" : dogoName;
+        String shelterNameInnerParam = shelterName == null ? "" : shelterName;
+
+        return this.shelterRepository.findAll().stream().filter(o ->
+                (shelterNameInnerParam.isEmpty() || o.getLocation().contains(shelterNameInnerParam)) &&
+                        (dogoNameInnerParam.isEmpty() || o.getDogs().stream().anyMatch(d -> d.getName().contains(dogoNameInnerParam))) &&
+                        !o.isDeleted()
+        ).collect(Collectors.toList());
     }
 
     public List<Owner> getAllOwners(String ownerName, String dogoName) {
@@ -65,7 +91,7 @@ public class DogoService {
         ).collect(Collectors.toList());
     }
 
-    public List<Dog> getAllDogsByOwner(Owner owner){
+    public List<Dog> getAllDogsByOwner(Owner owner) {
         return dogRepository.findAll().stream().filter(d -> d.getOwners().contains(owner)).collect(Collectors.toList());
     }
 
@@ -81,7 +107,9 @@ public class DogoService {
         return this.shelterRepository.saveAndFlush(shelter);
     }
 
-    public Owner getOwnerById(Long ownerId){
-        return this.ownerRepository.getById(ownerId);
+    public List<Dog> getAllDogsByShelter(Shelter shelter) {
+        return dogRepository.findAll().stream().filter(d -> d.getShelters().contains(shelter)).collect(Collectors.toList());
     }
+
+
 }

@@ -1,5 +1,6 @@
-package com.example.firstsemesterproj.UI;
+package com.example.firstsemesterproj.UI.owner;
 
+import com.example.firstsemesterproj.UI.MainLayout;
 import com.example.firstsemesterproj.entities.Dog;
 import com.example.firstsemesterproj.entities.Owner;
 import com.example.firstsemesterproj.services.DogoService;

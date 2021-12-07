@@ -1,5 +1,8 @@
 package com.example.firstsemesterproj.UI;
 
+import com.example.firstsemesterproj.UI.dogo.ListDogsLayout;
+import com.example.firstsemesterproj.UI.owner.ListOwnersLayout;
+import com.example.firstsemesterproj.UI.shelter.ListShelterLayout;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HighlightConditions;
@@ -16,10 +19,12 @@ public class MainLayout extends AppLayout {
         listLink.setHighlightCondition(HighlightConditions.sameLocation());
 
         RouterLink listOwnersLink = new RouterLink("Owners", ListOwnersLayout.class);
+        RouterLink listShelterLink = new RouterLink("Shelter", ListShelterLayout.class);
 
         addToDrawer(new VerticalLayout(
                 listLink,
-                listOwnersLink
+                listOwnersLink,
+                listShelterLink
         ));
         
     }

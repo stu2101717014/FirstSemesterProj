@@ -1,25 +1,20 @@
-package com.example.firstsemesterproj.UI;
+package com.example.firstsemesterproj.UI.dogo;
 
 import com.example.firstsemesterproj.entities.Dog;
 import com.example.firstsemesterproj.entities.Owner;
 import com.example.firstsemesterproj.entities.Shelter;
 import com.example.firstsemesterproj.services.DogoService;
 import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 

@@ -1,4 +1,4 @@
-package com.example.firstsemesterproj.UI;
+package com.example.firstsemesterproj.UI.owner;
 
 import com.example.firstsemesterproj.entities.Dog;
 import com.example.firstsemesterproj.entities.Owner;

@@ -12,7 +12,7 @@ public class Shelter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToMany(mappedBy = "shelters")
+    @ManyToMany(mappedBy = "shelters", fetch = FetchType.EAGER)
     private Set<Dog> dogs;
 
     @Column(name = "location", length = 255, nullable = true)
@@ -43,5 +43,13 @@ public class Shelter {
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public Set<Dog> getDogs() {
+        return dogs;
+    }
+
+    public void setDogs(Set<Dog> dogs) {
+        this.dogs = dogs;
     }
 }
